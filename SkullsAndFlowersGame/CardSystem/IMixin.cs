@@ -1,7 +1,6 @@
 ﻿namespace SkullsAndFlowersGame.CardSystem;
 
-public class Mixin
+public interface IMixin
 {
-    public IMixinContainer Container { get; set; }
-    public string MixinId { get; }
+    string MixinId { get; }
 }

@@ -1,4 +1,4 @@
-﻿namespace SkullsAndFlowersGame.CardSystem.Mixins;
+﻿namespace SkullsAndFlowersGame.CardSystem.Mixins.Abstractions;
 
 public interface IRemoveCardMixin : IMixin
 {

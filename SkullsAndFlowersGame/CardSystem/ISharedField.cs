@@ -1,6 +1,7 @@
 ﻿namespace SkullsAndFlowersGame.CardSystem;
 
-public interface ISharedFIeld
+public interface ISharedField : IMixinContainer, ICardContainer
 {
-    
+    string? CollectionId { get; }
+    int Count { get; }
 }

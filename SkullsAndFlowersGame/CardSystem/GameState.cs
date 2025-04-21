@@ -2,5 +2,9 @@
 
 public enum GameState
 {
-    
+    Draw,
+    Play,
+    EndTurn,
+    EndRound,
+    EndGame,
 }

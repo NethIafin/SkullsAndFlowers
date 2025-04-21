@@ -1,6 +1,6 @@
 ﻿namespace SkullsAndFlowersGame.CardSystem;
 
-public interface IMixinWithBackReference
+public interface IMixinContainerAware
 {
-    
+    IMixinContainer Container { get; set; }
 }

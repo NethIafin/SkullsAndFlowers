@@ -1,6 +1,6 @@
 ﻿namespace SkullsAndFlowersGame.CardSystem;
 
-public class ICardExtensionTemplate
+public interface ICardExtensionTemplate
 {
-    
+    ICard ExtendCard(ICard inputCard);
 }

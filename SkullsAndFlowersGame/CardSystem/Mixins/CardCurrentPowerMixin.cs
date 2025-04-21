@@ -1,6 +1,15 @@
-﻿namespace SkullsAndFlowersGame.CardSystem.Mixins;
+﻿using SkullsAndFlowersGame.CardSystem.Mixins.Abstractions;
 
-public class CardCurrentPowerMixin
+namespace SkullsAndFlowersGame.CardSystem.Mixins;
+
+public class CardCurrentPowerMixin : IValueMixin<int>, IEndTurnCardMixin
 {
+    public string MixinId => "Card Power";
+    public int Value { get; set; }
     
+    public void OnTurnEnd(GameContext context, ICard card, IPlayer activePlayer)
+    {
+        var totalPower = card.GetOfType<CardPowerMixin>().Sum(x => x.Value);
+        Value = totalPower;
+    }
 }

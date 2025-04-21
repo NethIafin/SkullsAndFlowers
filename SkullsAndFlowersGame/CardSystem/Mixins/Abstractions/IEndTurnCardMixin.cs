@@ -1,6 +1,6 @@
-﻿namespace SkullsAndFlowersGame.CardSystem.Mixins;
+﻿namespace SkullsAndFlowersGame.CardSystem.Mixins.Abstractions;
 
-public interface IEndTurnCardMixin
+public interface IEndTurnCardMixin : IMixin
 {
-    void OnTurnEnd(GameContext context, ICard card);
+    void OnTurnEnd(GameContext context, ICard card, IPlayer activePlayer);
 }

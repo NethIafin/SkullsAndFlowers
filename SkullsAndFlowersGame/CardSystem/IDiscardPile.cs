@@ -1,6 +1,7 @@
 ﻿namespace SkullsAndFlowersGame.CardSystem;
 
-public interface IDiscardPile
+public interface IDiscardPile : IMixinContainer, ICardContainer
 {
-    
+    string CollectionId { get; }
+    int Count { get; }
 }

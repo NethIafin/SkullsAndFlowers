@@ -2,5 +2,5 @@
 
 public interface ICardTemplate
 {
-    
+    ICard GenerateCard();
 }
