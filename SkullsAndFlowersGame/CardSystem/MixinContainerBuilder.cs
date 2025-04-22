@@ -2,6 +2,7 @@
 
 public class MixinContainerBuilder<T>(T buildableItem) where T : IMixinContainer
 {
+    public T Item => buildableItem;
     public MixinContainerBuilder<T> AddMixin<TM>(TM mixin) where TM : class, IMixin
     {
         buildableItem.AddMixin(mixin);
@@ -41,5 +42,17 @@ public static class MixinContainerBuilder
     {
         var card = DefaultsFactory.DefaultTokenCard(name);
         return new MixinContainerBuilder<ICard>(card);
+    }
+
+    public static MixinContainerBuilder<GameContext> StartWorld()
+    {
+        var world = new GameContext();
+        return new MixinContainerBuilder<GameContext>(world);
+    }
+
+    public static MixinContainerBuilder<GameContext> AddPlayerWithDeck(this MixinContainerBuilder<GameContext> builder, IPlayer player, IDeck deck)
+    {
+        builder.Item.AddPlayer(player, deck);
+        return builder;
     }
 }

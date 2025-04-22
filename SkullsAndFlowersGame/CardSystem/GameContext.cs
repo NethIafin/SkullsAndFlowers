@@ -1,8 +1,9 @@
-﻿using SkullsAndFlowersGame.CardSystem.ScheduledActions;
+﻿using System.Diagnostics;
+using SkullsAndFlowersGame.CardSystem.ScheduledActions;
 
 namespace SkullsAndFlowersGame.CardSystem;
 
-public class GameContext
+public class GameContext : IMixinContainer
 {
     public int ActivePlayer { get; set; } = 0;
     public int Turn { get; set; } = 0;
@@ -20,6 +21,8 @@ public class GameContext
     {
         Players.Add(player);
         player.MatchPlayerId = Players.Count - 1;
+        player.Passed = false;
+        player.Score = 0;
         Decks.Add(deck);
         DiscardPiles.Add(pile);
         PlayFields.Add(playField);
@@ -54,5 +57,30 @@ public class GameContext
     public void ScheduleDrawAction(IPlayer player)
     {
         ScheduledActions.Enqueue(new ScheduleDrawAction() { DrawingPlayer = player});
+    }
+    
+    private readonly List<IMixin> _mixins = new();
+    private readonly Dictionary<Type, IEnumerable<IMixin>> _cachedMixins = new();
+
+    public void AddMixin<T>(T mixin) where T : class, IMixin
+    {
+        Debug.Assert(mixin != null, $"Mixin has to be not null");
+        
+        _mixins.Add(mixin);
+        
+        _cachedMixins.Clear();
+    }
+    
+    public IEnumerable<T> GetOfType<T>() where T : class, IMixin
+    {
+        if (_cachedMixins.TryGetValue(typeof(T), out var cache))
+        {
+            return cache.Cast<T>();
+        }
+
+        var result = _mixins.Where(x => x is T).ToArray();
+        _cachedMixins.Add(typeof(T), result);
+
+        return result.Cast<T>();
     }
 }

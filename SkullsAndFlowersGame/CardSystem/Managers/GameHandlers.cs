@@ -125,6 +125,14 @@ public static partial class GameHandlers
         context.PlayerHands[playerId].AddCard(nextCard);
     }
     
+    public static void StartGame(GameContext context)
+    {
+        foreach (var gameStartMixin in context.GetOfType<IGameStartMixin>())
+        {
+            gameStartMixin.OnGameStart(context);
+        }
+    }
+    
     public static void EndTurn(GameContext context, IPlayer activePlayer)
     {
         foreach (var cardPlayedEffect in EachCardOnFieldMatchingWithCard<IEndTurnCardMixin>(context))
@@ -140,6 +148,19 @@ public static partial class GameHandlers
         foreach (var fieldEffect in EachFieldMatchingWithField<IEndTurnFieldMixin>(context))
         {
             fieldEffect.Item2.OnTurnEnd(context, fieldEffect.Item1, activePlayer);
+        }
+    }
+    
+    public static void StartTurn(GameContext context, IPlayer activePlayer)
+    {
+        foreach (var cardPlayedEffect in EachCardOnFieldMatchingWithCard<IStartTurnCardMixin>(context))
+        {
+            cardPlayedEffect.Item2.OnTurnStart(context, cardPlayedEffect.Item1, activePlayer);
+        }
+        
+        foreach (var cardPlayedEffect in EachCardInSharedMatchingWithCard<IStartTurnCardMixin>(context))
+        {
+            cardPlayedEffect.Item2.OnTurnStart(context, cardPlayedEffect.Item1, activePlayer);
         }
     }
 }

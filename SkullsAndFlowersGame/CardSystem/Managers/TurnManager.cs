@@ -48,4 +48,46 @@ public class TurnManager
             }
         }
     }
+
+    public bool EndTurn()
+    {
+        GameHandlers.EndTurn(Context, Context.Players[Context.ActivePlayer]);
+        DequeueAllActions();
+        Context.ActivePlayer++;
+        if (Context.ActivePlayer >= Context.Players.Count)
+        {
+            Context.ActivePlayer = 0;
+            Context.Turn++;
+            if (Context.Players.All(x => x.Passed))
+                return false;
+        }
+
+        return true;
+    }
+
+    public bool StartTurn()
+    {
+        GameHandlers.StartTurn(Context, Context.Players[Context.ActivePlayer]);
+        DequeueAllActions();
+        
+        if (Context.Players[Context.ActivePlayer].Passed)
+            return false;
+
+        return true;
+    }
+
+    public bool StartGame()
+    {
+        if (Context.Players.Count < 2)
+            return false;
+        
+        GameHandlers.StartGame(Context);
+        DequeueAllActions();
+        return true;
+    }
+
+    public void EndRound()
+    {
+        
+    }
 }

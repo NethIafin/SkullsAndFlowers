@@ -4,74 +4,56 @@ using SkullsAndFlowersGame;
 using SkullsAndFlowersGame.CardSystem;
 using SkullsAndFlowersGame.CardSystem.Instances.Admin;
 using SkullsAndFlowersGame.CardSystem.Instances.Flower.Expansion0;
+using SkullsAndFlowersGame.CardSystem.Instances.Mutators.WorldStart;
 using SkullsAndFlowersGame.CardSystem.Managers;
 using SkullsAndFlowersGame.CardSystem.Mixins;
 using SkullsAndFlowersGame.CardSystem.Mixins.Abstractions;
 
-var game = new GameContext();
+var game = new DefaultWorld().PrepareWorld();
 var gameHandler = new TurnManager()
 {
     Context = game
 };
 
-var p1 = new Player();
-var p2 = new Player();
+var deck1 = GameStateHelper.GenerateDeck("tulip:3", "daisy:3", "rose:3", "royal tulip:3", "oak:3");
+var deck2 = GameStateHelper.GenerateDeck("tulip:3", "daisy:3", "rose:3", "royal tulip:3", "oak:3");
 
-var deck1 = new Deck();
-
-deck1.AddCardToTop(new Tulip().GenerateCard());
-deck1.AddCardToTop(new Tulip().GenerateCard());
-deck1.AddCardToTop(new AnnihilatingLight().GenerateCard());
-deck1.AddCardToTop(new Rose().GenerateCard());
-deck1.AddCardToTop(new Daisy().GenerateCard());
-deck1.AddCardToTop(new Oak().GenerateCard());
-deck1.AddCardToTop(new RoyalTulip().GenerateCard());
-deck1.AddCardToTop(new Tulip().GenerateCard());
-
-var deck2 = new Deck();
-deck2.AddCardToTop(new Tulip().GenerateCard());
-deck2.AddCardToTop(new Tulip().GenerateCard());
-deck2.AddCardToTop(new Tulip().GenerateCard());
-deck2.AddCardToTop(new Tulip().GenerateCard());
+var p1 = GameStateHelper.GeneratePlayerForDeck(deck1);
+var p2 = GameStateHelper.GeneratePlayerForDeck(deck2);
 
 game.AddPlayer(p1, deck1);
 game.AddPlayer(p2, deck2);
 
-foreach (var card in deck1.Cards)
+gameHandler.StartGame();
+
+var shouldTerminate = false;
+
+while (!shouldTerminate)
 {
-    card.Owner = p1;
+    var canStartTurn = gameHandler.StartTurn();
+
+    var activePlayerId = gameHandler.Context.ActivePlayer;
+    
+    if (!canStartTurn)
+    {
+        Console.WriteLine($"Player {activePlayerId} already passed.");
+        var canEndTurn = gameHandler.EndTurn();
+        if (!canEndTurn)
+        {
+            Console.WriteLine($"All players passed, round end.");
+            break;
+        }
+        continue;
+    }
+    gameHandler.WriteGameState();
+
+    shouldTerminate = !gameHandler.ConsoleActionHelper();
+    
+    gameHandler.EndTurn();
+
+    var currentPower = gameHandler.Context.PlayFields[activePlayerId].GetOfType<FieldPowerMixin>().FirstOrDefault()
+        ?.Value.ToString();
+    
+    
+    Console.WriteLine($"\t Total Power on board for player {activePlayerId} is {currentPower} ");
 }
-
-foreach (var card in deck2.Cards)
-{
-    card.Owner = p2;
-}
-
-gameHandler.WriteGameState();
-gameHandler.DrawCards(6);
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByName("tulip");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByNameTargetingOwnFieldCard("royal tulip", "tulip");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByNameTargetingOwnHandCard("rose", "tulip");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByName("oak");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByName("daisy");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByName("!!! annihilating light");
-gameHandler.WriteGameState();
-
-gameHandler.PlayCardByName("tulip");
-gameHandler.WriteGameState();
-
-GameHandlers.EndTurn(game, p1);
-
-Console.WriteLine(game.PlayFields[0].GetOfType<FieldPowerMixin>().FirstOrDefault()?.Value.ToString());
