@@ -28,6 +28,12 @@ public static class GameStateHelper
         Console.WriteLine($"\t Field: {game.Context.PlayFields[playerId]}");
         Console.WriteLine($"\t Discard: {game.Context.DiscardPiles[playerId]}");
     }
+    
+    public static void WriteScore(this TurnManager game)
+    {
+        Console.WriteLine("\t\tCurrent score:");
+        Console.WriteLine($"\t\t{string.Join(", ", game.Context.Players.Select(x=>$"Player {x.MatchPlayerId}: {x.Score}"))}");
+    }
 
     public static bool PlayCardByName(this TurnManager game, string cardName)
     {
@@ -43,8 +49,7 @@ public static class GameStateHelper
             return false;
         }
         
-        GameHandlers.PlayCard(game.Context, game.Context.PlayerHands[playerId], game.Context.PlayFields[playerId], selectedCard, game.Context.Players[playerId]);
-        game.DequeueAllActions();
+        GameHandlers.PlayCard(game.Context, game.Context.PlayFields[playerId], selectedCard, game.Context.Players[playerId]);
         
         return true;
     }
@@ -74,8 +79,7 @@ public static class GameStateHelper
             return false;
         }
         
-        GameHandlers.PlayCard(game.Context, game.Context.PlayerHands[playerId], game.Context.PlayFields[playerId], sourceCard, game.Context.Players[playerId]);
-        game.DequeueAllActions();
+        GameHandlers.PlayCard(game.Context, game.Context.PlayFields[playerId], sourceCard, game.Context.Players[playerId]);
 
         return true;
     }
@@ -105,8 +109,7 @@ public static class GameStateHelper
             return false;
         }
         
-        GameHandlers.PlayCard(game.Context, game.Context.PlayerHands[playerId], game.Context.PlayFields[playerId], sourceCard, game.Context.Players[playerId]);
-        game.DequeueAllActions();
+        GameHandlers.PlayCard(game.Context, game.Context.PlayFields[playerId], sourceCard, game.Context.Players[playerId]);
 
         return true;
     }
@@ -116,8 +119,6 @@ public static class GameStateHelper
         var playerId = game.Context.ActivePlayer;
         for(var i=0; i<numberOfCards;i++)
             game.Context.ScheduleDrawAction(game.Context.Players[playerId]);
-        
-        game.DequeueAllActions();
     }
 
     public static IDeck GenerateDeck(params string[] cardNames)
@@ -196,8 +197,12 @@ public static class GameStateHelper
             }
         }
 
+        GameHandlers.DequeueAllActions(manager.Context);
+
         return true;
     }
+    
+    
     
     
     public static List<TInterface> FindAndInstantiateImplementations<TInterface>(Assembly assembly = null)

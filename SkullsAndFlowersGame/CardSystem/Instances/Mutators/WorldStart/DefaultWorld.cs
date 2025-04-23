@@ -8,6 +8,10 @@ public class DefaultWorld : IWorldTemplate
     {
         return MixinContainerBuilder.StartWorld()
             .AddHandler<DefaultGameStartMixin>()
+            .AddHandler<LastRoundWinnerMixin>()
+            .AddHandler<GameHasWinnerMixin>()
+            .AddHandler<EndRoundVictorDrawsCardMixin>()
+            .AddHandler<StandardWorldEndRoundCleanupMixin>()
             .Build();
     }
 }

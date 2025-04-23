@@ -59,6 +59,11 @@ public class GameContext : IMixinContainer
         ScheduledActions.Enqueue(new ScheduleDrawAction() { DrawingPlayer = player});
     }
     
+    public void SchedulePlaceAction(ICard card, IPlayer player)
+    {
+        ScheduledActions.Enqueue(new ScheduledPlaceCard() { Player = player, Card = card});
+    }
+    
     private readonly List<IMixin> _mixins = new();
     private readonly Dictionary<Type, IEnumerable<IMixin>> _cachedMixins = new();
 

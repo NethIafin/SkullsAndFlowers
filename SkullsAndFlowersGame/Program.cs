@@ -27,33 +27,43 @@ game.AddPlayer(p2, deck2);
 gameHandler.StartGame();
 
 var shouldTerminate = false;
+var shouldTerminateRound = false;
 
 while (!shouldTerminate)
 {
-    var canStartTurn = gameHandler.StartTurn();
-
-    var activePlayerId = gameHandler.Context.ActivePlayer;
-    
-    if (!canStartTurn)
+    while (!shouldTerminate || !shouldTerminateRound)
     {
-        Console.WriteLine($"Player {activePlayerId} already passed.");
-        var canEndTurn = gameHandler.EndTurn();
-        if (!canEndTurn)
+        var canStartTurn = gameHandler.StartTurn();
+
+        var activePlayerId = gameHandler.Context.ActivePlayer;
+
+        if (!canStartTurn)
         {
-            Console.WriteLine($"All players passed, round end.");
-            break;
+            Console.WriteLine($"Player {activePlayerId} already passed.");
+            var canEndTurn = gameHandler.EndTurn();
+            if (!canEndTurn)
+            {
+                Console.WriteLine($"All players passed, round end.");
+                shouldTerminateRound = true;
+                break;
+            }
+
+            continue;
         }
-        continue;
+
+        gameHandler.WriteGameState();
+
+        shouldTerminate = !gameHandler.ConsoleActionHelper();
+
+        gameHandler.EndTurn();
+
+        var currentPower = gameHandler.Context.PlayFields[activePlayerId].GetOfType<FieldPowerMixin>().FirstOrDefault()
+            ?.Value.ToString();
+
+
+        Console.WriteLine($"\t Total Power on board for player {activePlayerId} is {currentPower} ");
     }
-    gameHandler.WriteGameState();
 
-    shouldTerminate = !gameHandler.ConsoleActionHelper();
-    
-    gameHandler.EndTurn();
-
-    var currentPower = gameHandler.Context.PlayFields[activePlayerId].GetOfType<FieldPowerMixin>().FirstOrDefault()
-        ?.Value.ToString();
-    
-    
-    Console.WriteLine($"\t Total Power on board for player {activePlayerId} is {currentPower} ");
+    shouldTerminate = !gameHandler.EndRound();
+    gameHandler.WriteScore();
 }

@@ -31,6 +31,7 @@ public class Card : ICard
 
     public string? Identifier { get; init; }
     public IPlayer? Owner { get; set; }
+    public ICardContainer? Container { get; set; }
 
     public override string ToString()
     {
