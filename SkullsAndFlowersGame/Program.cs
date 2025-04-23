@@ -16,7 +16,7 @@ var gameHandler = new TurnManager()
 };
 
 var deck1 = GameStateHelper.GenerateDeck("tulip:3", "daisy:3", "rose:3", "clear skies:3", "oak:3");
-var deck2 = GameStateHelper.GenerateDeck("tulip:3", "daisy:3", "rose:3", "soil tilling:3", "oak:3");
+var deck2 = GameStateHelper.GenerateDeck("tulip:3", "daisy:3", "rose:3", "soil fertilizing:3", "oak:3");
 
 var p1 = GameStateHelper.GeneratePlayerForDeck(deck1);
 var p2 = GameStateHelper.GeneratePlayerForDeck(deck2);
