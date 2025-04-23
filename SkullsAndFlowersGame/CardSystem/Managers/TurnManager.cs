@@ -25,11 +25,11 @@ public class TurnManager
 
     public bool StartTurn()
     {
-        GameHandlers.StartTurn(Context, Context.Players[Context.ActivePlayer]);
-        GameHandlers.DequeueAllActions(Context);
-        
         if (Context.Players[Context.ActivePlayer].Passed)
             return false;
+        
+        GameHandlers.StartTurn(Context, Context.Players[Context.ActivePlayer]);
+        GameHandlers.DequeueAllActions(Context);
 
         return true;
     }

@@ -43,6 +43,12 @@ public static class MixinContainerBuilder
         var card = DefaultsFactory.DefaultTokenCard(name);
         return new MixinContainerBuilder<ICard>(card);
     }
+    
+    public static MixinContainerBuilder<ICard> StartGlobal(string name)
+    {
+        var card = DefaultsFactory.DefaultGlobalCard(name);
+        return new MixinContainerBuilder<ICard>(card);
+    }
 
     public static MixinContainerBuilder<GameContext> StartWorld()
     {

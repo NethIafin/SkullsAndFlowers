@@ -9,8 +9,9 @@ public class Rose : ICardTemplate
         return MixinContainerBuilder.StartCard("rose")
             .SetCardPower(6)
             .AddHandler<RequiresTargetCardInHandMixin>()
-            .AddHandler<RequiresDiscardTargetCardOnPlayMixin>()
+            .DiscardTargetedCards()
             .AddHandler<DrawCardOnDiscardMixin>()
+            .AddHandler<DrawCardOnRemoveMixin>()
             .Build();
     }
 }

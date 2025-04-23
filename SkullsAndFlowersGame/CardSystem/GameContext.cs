@@ -66,6 +66,8 @@ public class GameContext : IMixinContainer
     
     private readonly List<IMixin> _mixins = new();
     private readonly Dictionary<Type, IEnumerable<IMixin>> _cachedMixins = new();
+    
+    public IEnumerable<IMixin> AllMixins => _mixins;
 
     public void AddMixin<T>(T mixin) where T : class, IMixin
     {

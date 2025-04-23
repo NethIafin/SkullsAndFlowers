@@ -7,13 +7,18 @@ public class RequiresNamedCardOnTheFieldMixin : ITargetCardMixin
     public string MixinId => "Requires Named Card On The Field";
     public ICard? TargetCard { get; set; }
     public ICardContainer? TargetCardContainer { get; set; }
-    public TargetingFlags ValidTarget => TargetingFlags.Field | TargetingFlags.CommonField;
+    public TargetingFlags ValidTarget => TargetingFlags.Field | TargetingFlags.CommonField | TargetingFlags.Own;
     
     public required IEnumerable<string> CardTypeNames { get; init; }
     
     public bool SetTarget(GameContext context, ICardContainer targetCardSource, ICard targetCard, ICard thisCard)
     {
         if (targetCardSource is not IPlayField && targetCardSource is not ISharedField)
+        {
+            return false;
+        }
+
+        if (targetCard.Owner != thisCard.Owner)
         {
             return false;
         }

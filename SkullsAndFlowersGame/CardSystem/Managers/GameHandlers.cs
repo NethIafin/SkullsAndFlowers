@@ -12,6 +12,17 @@ public static partial class GameHandlers
         card.Container?.RemoveCard(card);
         card.Container = null;
             
+        var shouldPlaceCard = true;
+
+        foreach (var returnCardEffect in card.GetOfType<IPlaceCardMixin>())
+        {
+            if (!returnCardEffect.OnTryCardPlaced(context, field, card))
+                shouldPlaceCard = false;
+        }
+
+        if (!shouldPlaceCard)
+            return;
+        
         field.AddCard(card);
         card.Container = field;
 
@@ -45,8 +56,19 @@ public static partial class GameHandlers
         card.Container?.RemoveCard(card);
         card.Container = null;
         
-        field.AddCard(card);
-        card.Container = field;
+        var shouldPlaceCard = true;
+
+        foreach (var returnCardEffect in card.GetOfType<IPlaceCardMixin>())
+        {
+            if (!returnCardEffect.OnTryCardPlaced(context, field, card))
+                shouldPlaceCard = false;
+        }
+
+        if (shouldPlaceCard)
+        {
+            field.AddCard(card);
+            card.Container = field;
+        }
     }
     
 
@@ -93,8 +115,19 @@ public static partial class GameHandlers
         if (playerId == null)
             return;
 
-        context.PlayerHands[playerId.Value].AddCard(card);
-        card.Container = context.PlayerHands[playerId.Value];
+        var shouldAddCard = true;
+
+        foreach (var returnCardEffect in card.GetOfType<IPutCardToHandMixin>())
+        {
+            if (!returnCardEffect.OnTryPutCardToHand(context, card))
+                shouldAddCard = false;
+        }
+
+        if (shouldAddCard)
+        {
+            context.PlayerHands[playerId.Value].AddCard(card);
+            card.Container = context.PlayerHands[playerId.Value];
+        }
     }
     
     public static void RemoveCard(GameContext context, ICard card)
@@ -147,6 +180,7 @@ public static partial class GameHandlers
     public static void StandardWorldCleanup(GameContext context)
     {
         var cardsToRemove = new List<IEnumerable<ICard>>();
+        var globalCardsToRemove = new List<ICard>();
 
         for (var i = 0; i < context.PlayFields.Count; i++)
         {
@@ -160,6 +194,13 @@ public static partial class GameHandlers
             }
             cardsToRemove.Add(result);
         }
+        
+        while (context.SharedField.Count > 0)
+        {
+            var card = context.SharedField.Cards.First();
+            globalCardsToRemove.Add(card);
+            context.SharedField.RemoveCard(card);
+        }
 
         for (var i = 0; i < context.PlayFields.Count; i++)
         {
@@ -170,6 +211,15 @@ public static partial class GameHandlers
                 {
                     endRoundCardMixin.OnRoundEnd(context, card);
                 }
+            }
+        }
+
+        for (var i = 0; i < globalCardsToRemove.Count; i++)
+        {
+            var cardsToRunRemoval = globalCardsToRemove[i];
+            foreach (var endRoundCardMixin in cardsToRunRemoval.GetOfType<IEndRoundCardMixin>())
+            {
+                endRoundCardMixin.OnRoundEnd(context, cardsToRunRemoval);
             }
         }
 

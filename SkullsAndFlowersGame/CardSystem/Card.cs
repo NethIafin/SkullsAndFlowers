@@ -29,6 +29,8 @@ public class Card : ICard
         return result.Cast<T>();
     }
 
+    public IEnumerable<IMixin> AllMixins => _mixins;
+
     public string? Identifier { get; init; }
     public IPlayer? Owner { get; set; }
     public ICardContainer? Container { get; set; }

@@ -9,7 +9,7 @@ public class RoyalRose : ICardTemplate
         return MixinContainerBuilder.StartCard("royal rose")
             .SetCardPower(8)
             .RequiresTargetCardWithPowerInHand(4)
-            .AddHandler<RequiresDiscardTargetCardOnPlayMixin>()
+            .DiscardTargetedCards()
             .Build();
     }
 }

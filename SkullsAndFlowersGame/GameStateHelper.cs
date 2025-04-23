@@ -24,6 +24,7 @@ public static class GameStateHelper
         var playerId = game.Context.ActivePlayer;
         Console.WriteLine("");
         Console.WriteLine($"State for Turn {game.Context.Turn}, Player {playerId}, Deck size {game.Context.Decks[playerId].Count}");
+        Console.WriteLine($"\t\t Global: {game.Context.SharedField}");
         Console.WriteLine($"\t Hand: {game.Context.PlayerHands[playerId]}");
         Console.WriteLine($"\t Field: {game.Context.PlayFields[playerId]}");
         Console.WriteLine($"\t Discard: {game.Context.DiscardPiles[playerId]}");
