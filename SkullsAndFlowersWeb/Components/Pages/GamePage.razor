@@ -1,0 +1,569 @@
+﻿@page "/game/{GameId}"
+@rendermode InteractiveServer
+@using SkullsAndFlowersWeb.Services
+@using SkullsAndFlowersGame.CardSystem
+@using SkullsAndFlowersGame.CardSystem.Mixins
+@using SkullsAndFlowersGame.CardSystem.Mixins.Abstractions
+@using SkullsAndFlowersWeb.Models
+@inject GameService GameService
+@inject CardDefinitionService CardDefinitionService
+@implements IDisposable
+
+<PageTitle>Game - Skulls And Flowers</PageTitle>
+
+@if (!isGameValid)
+{
+    <div class="alert alert-danger m-4">
+        <h4>Game Not Found</h4>
+        <p>The game with ID "@GameId" was not found. Please check the ID and try again.</p>
+        <a href="/create-game" class="btn btn-primary">Create New Game</a>
+    </div>
+}
+else
+{
+    <div class="game-container container-fluid">
+        <ArrowManager @ref="arrowManager" Arrows="arrows" />
+        <div class="row m-0">
+        <div class="col-md-8">
+            <!-- Game Board -->
+            <div class="game-board">
+                <!-- Opponent Area -->
+                <div class="opponent-area mb-4">
+                    <h4 class="mb-2">Opponent</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <span>Opponent Hand (@opponentHand.Count cards)</span>
+                            <span>Deck: @opponentDeckCount cards</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="opponent-hand d-flex flex-wrap gap-2">
+                                @for (int i = 0; i < opponentHand.Count; i++)
+                                {
+                                    var index = i;
+                                    <div class="card-back">
+                                        <div class="card-inner">
+                                            ?
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header d-flex justify-content-between">
+                            <span>Opponent Field</span>
+                            <span class="text-danger fw-bold">
+                                Total Power: @(opponentFieldPower)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="opponent-field d-flex flex-wrap gap-2">
+                                @if (!opponentField.Any())
+                                {
+                                    <div class="empty-field">No cards on field</div>
+                                }
+                                else
+                                {
+                                    @for (int i = 0; i < opponentField.Count; i++)
+                                    {
+                                        var card = opponentField[i];
+                                        var cardId = $"card-opponent-field-{i}";
+                                        <CardComponent CardId="@cardId" Card="@card"/>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shared Field -->
+                <div class="shared-field mb-4">
+                    <h4 class="mb-2">Shared Field</h4>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Global Effects</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="shared-cards d-flex flex-wrap gap-2">
+                                @if (!sharedField.Any())
+                                {
+                                    <div class="empty-field">No cards on shared field</div>
+                                }
+                                else
+                                {
+                                    @foreach (var card in sharedField)
+                                    {
+                                        <CardComponent CardId="card-shared" Card="@card"/>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Field -->
+                <div class="player-field mb-4">
+                    <h4 class="mb-2">Your Field</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <span>Field Cards</span>
+                            <span class="text-success fw-bold">
+                                Total Power: @(playerFieldPower)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="player-field-cards d-flex flex-wrap gap-2">
+                                @if (!playerField.Any())
+                                {
+                                    <div class="empty-field">No cards on field</div>
+                                }
+                                else
+                                {
+                                    @for (int i = 0; i < playerField.Count; i++)
+                                    {
+                                        var card = playerField[i];
+                                        var index = i;
+                                        var cardId = $"card-player-field-{i}";
+                                        <CardComponent CardId="@cardId" 
+                                            Card="@card"
+                                                       AdditionalClasses="@(targetingMode && targetType == "field" ? "targetable" : "")"
+                                                       OnCardClick="() => HandleFieldCardClick(index)"/>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Hand -->
+                <div class="player-hand mb-4">
+                    <h4 class="mb-2">Your Hand</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <span>Hand Cards</span>
+                            <span>Deck: @playerDeckCount cards</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="player-hand-cards d-flex flex-wrap gap-2">
+                                @if (!playerHand.Any())
+                                {
+                                    <div class="empty-hand">Your hand is empty</div>
+                                }
+                                else
+                                {
+                                    @for (int i = 0; i < playerHand.Count; i++)
+                                    {
+                                        var card = playerHand[i];
+                                        var index = i;
+                                        var cardId = $"card-own-hand-{i}";
+                                        <CardComponent
+                                            CardId="@cardId" 
+                                            Card="@card"
+                                                       AdditionalClasses="@(targetingMode && targetType == "hand" ? "targetable" : "")"
+                                                       OnCardClick="() => HandleHandCardClick(index)"/>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons mb-4">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-warning" @onclick="PassTurn" disabled="@(!isPlayerTurn || isGameEnded)">
+                            Pass Turn
+                        </button>
+
+                        @if (isRoundEnded)
+                        {
+                            <button class="btn btn-info" @onclick="EndRound">
+                                Start Next Round
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Game Info and Log -->
+            <div class="game-info mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Game Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Game ID:</strong> @GameId</p>
+                        <p><strong>Current Turn:</strong> @gameContext.Turn</p>
+                        <p><strong>Active Player:</strong> @(isPlayerTurn ? "You" : "Opponent")</p>
+
+                        <h5 class="mt-3">Score</h5>
+                        <ul class="list-group">
+                            @foreach (var player in gameContext.Players)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @(player.MatchPlayerId == currentPlayerId ? "You" : "Opponent")
+                                    <span class="badge bg-primary rounded-pill">@player.Score</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <h5 class="mt-3">Player Power</h5>
+                        <ul class="list-group">
+                            @for (var playerId = 0; playerId < gameContext.PlayFields.Count; playerId++)
+                            {
+                                var field = gameContext.PlayFields[playerId];
+                                var power = field.GetOfType<FieldPowerMixin>().FirstOrDefault()?.Value ?? 0;
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @(playerId == currentPlayerId ? "You" : "Opponent")
+                                    <span class="badge bg-success rounded-pill">@power</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="alert @(targetingMode ? "alert-warning" : "alert-info") mt-3">
+                            @if (targetingMode)
+                            {
+                                <span>Select a @targetType card to target</span>
+                            }
+                            else if (!isPlayerTurn)
+                            {
+                                <span>Waiting for opponent's turn...</span>
+                            }
+                            else if (isRoundEnded)
+                            {
+                                <span>Round ended. Start next round.</span>
+                            }
+                            else if (isGameEnded)
+                            {
+                                <span>Game ended!</span>
+                            }
+                            else
+                            {
+                                <span>Your turn! Play a card, draw, or pass.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discard Pile -->
+            <div class="discard-pile mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h4>Discard Pile</h4>
+                        <span class="badge bg-secondary">@playerDiscard.Count cards</span>
+                    </div>
+                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        @if (!playerDiscard.Any() && !opponentDiscard.Any())
+                        {
+                            <div class="alert alert-info">No cards in discard piles</div>
+                        }
+                        else
+                        {
+                            <div class="accordion" id="discardAccordion">
+                                @if (playerDiscard.Any())
+                                {
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                                Your Discard (@playerDiscard.Count)
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show"
+                                             aria-labelledby="headingOne" data-bs-parent="#discardAccordion">
+                                            <div class="accordion-body">
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @for (var i=0; i<playerDiscard.Count; i++)
+                                                    {
+                                                        var cardId = $"card-own-discard-{i}";
+                                                        <CardComponent CardId="@cardId" Card="@playerDiscard[i]"/>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (opponentDiscard.Any())
+                                {
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button @(playerDiscard.Any() ? "collapsed" : "")"
+                                                    type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseTwo">
+                                                Opponent Discard (@opponentDiscard.Count)
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse @(!playerDiscard.Any() ? "show" : "")"
+                                             aria-labelledby="headingTwo" data-bs-parent="#discardAccordion">
+                                            <div class="accordion-body">
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @for (var i=0; i<opponentDiscard.Count; i++)
+                                                    {
+                                                        var cardId = $"card-opponent-discard-{i}";
+                                                        <CardComponent CardId="@cardId" Card="@opponentDiscard[i]"/>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Log -->
+            <div class="game-log">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Game Log</h4>
+                    </div>
+                    <div class="card-body game-log-content" style="max-height: 300px; overflow-y: auto;">
+                        @foreach (var logEntry in gameLog)
+                        {
+                            <div class="log-entry">@logEntry</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string GameId { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "playerId")]
+    public int PlayerId { get; set; } = 0;
+    
+    private List<Arrow> arrows = new List<Arrow>();
+    private ArrowManager arrowManager;
+
+    private int currentPlayerId;
+    private int opponentPlayerId;
+    private GameService.GameInstance gameInstance;
+    private GameContext gameContext;
+    private List<ICard> playerHand = new();
+    private List<ICard> playerField = new();
+    private List<ICard> playerDiscard = new();
+    private List<ICard> opponentHand = new();
+    private List<ICard> opponentField = new();
+    private List<ICard> opponentDiscard = new();
+    private List<ICard> sharedField = new();
+    private List<string> gameLog = new();
+    private int playerDeckCount;
+    private int opponentDeckCount;
+    private int playerFieldPower;
+    private int opponentFieldPower;
+    private bool isPlayerTurn;
+    private bool isGameValid;
+    private bool isRoundEnded;
+    private bool isGameEnded;
+
+    // Targeting state
+    private bool targetingMode;
+    private string targetType; // "hand" or "field"
+    private int selectedCardIndex = -1;
+
+    // Timer for auto-refresh
+    private System.Threading.Timer refreshTimer;
+
+    protected override void OnInitialized()
+    {
+        // Try to get the game instance
+        isGameValid = GameService.TryGetGame(GameId, out gameInstance);
+
+        if (isGameValid)
+        {
+            // Get the current player ID and opponent ID
+            currentPlayerId = PlayerId == 1 ? 1 : 0;
+            opponentPlayerId = currentPlayerId == 0 ? 1 : 0;
+
+            // Update game state
+            UpdateGameState();
+
+            // Set up timer for periodic refresh (every 1 second)
+            refreshTimer = new System.Threading.Timer(
+                _ => InvokeAsync(UpdateGameState),
+                null,
+                TimeSpan.Zero,
+                TimeSpan.FromSeconds(1)
+            );
+        }
+    }
+
+    private void PassTurn()
+    {
+        if (!isPlayerTurn || isGameEnded) return;
+
+        bool success = GameService.PassTurn(GameId);
+
+        if (success)
+        {
+            // May end the round if all players have passed
+            UpdateGameState();
+        }
+    }
+
+    private void EndRound()
+    {
+        if (!isRoundEnded) return;
+
+        bool success = GameService.EndRound(GameId);
+
+        if (success)
+        {
+            UpdateGameState();
+
+            // Start the next round's first turn
+            GameService.StartTurn(GameId);
+            UpdateGameState();
+        }
+        else
+        {
+            // Game is over
+            isGameEnded = true;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        // Clean up timer when component is disposed
+        refreshTimer?.Dispose();
+    }
+
+    private void UpdateGameState()
+    {
+        if (!isGameValid) return;
+
+        // Get the game context
+        gameContext = gameInstance.GameHandler.Context;
+
+        // Get player and opponent hands, fields, and discard piles
+        playerHand = gameContext.PlayerHands[currentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+        playerField = gameContext.PlayFields[currentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+        playerDiscard = gameContext.DiscardPiles[currentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+
+        opponentHand = gameContext.PlayerHands[opponentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+        opponentField = gameContext.PlayFields[opponentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+        opponentDiscard = gameContext.DiscardPiles[opponentPlayerId]?.Cards?.ToList() ?? new List<ICard>();
+
+        // Get shared field
+        sharedField = gameContext.SharedField?.Cards?.ToList() ?? new List<ICard>();
+
+        // Get deck counts
+        playerDeckCount = gameContext.Decks[currentPlayerId]?.Count ?? 0;
+        opponentDeckCount = gameContext.Decks[opponentPlayerId]?.Count ?? 0;
+
+        // Get field power values
+        playerFieldPower = gameContext.PlayFields[currentPlayerId]?.GetOfType<FieldPowerMixin>()
+            .FirstOrDefault()?.Value ?? 0;
+        opponentFieldPower = gameContext.PlayFields[opponentPlayerId]?.GetOfType<FieldPowerMixin>()
+            .FirstOrDefault()?.Value ?? 0;
+
+        // Check if it's the player's turn
+        isPlayerTurn = gameContext.ActivePlayer == currentPlayerId;
+
+        // Check round ended state
+        isRoundEnded = gameInstance.IsRoundEnded;
+
+        // Get game log
+        gameLog = gameInstance.GameLog.ToList();
+
+        // Force UI update
+        StateHasChanged();
+    }
+
+    private void HandleHandCardClick(int index)
+    {
+        if (!isPlayerTurn || isGameEnded) return;
+
+        if (targetingMode)
+        {
+            if (index == selectedCardIndex)
+            {
+                targetingMode = false;
+                selectedCardIndex = -1;
+                UpdateGameState();
+            }
+            
+            if (targetType == "hand")
+            {
+                // Play the selected card targeting another hand card
+                bool success = GameService.PlayCardTargetingHandCard(GameId, selectedCardIndex, index);
+
+                if (success)
+                {
+                    targetingMode = false;
+                    selectedCardIndex = -1;
+                    UpdateGameState();
+                }
+            }
+            
+            if (targetType == "field")
+            {
+                // Play the selected card targeting another hand card
+                bool success = GameService.PlayCardTargetingFieldCard(GameId, selectedCardIndex, index);
+
+                if (success)
+                {
+                    targetingMode = false;
+                    selectedCardIndex = -1;
+                    UpdateGameState();
+                }
+            }
+        }
+        else
+        {
+            // Check if the card requires targeting
+            var card = playerHand[index];
+            var requiresTargetMixin = card.GetOfType<ITargetCardMixin>().FirstOrDefault(mixin => mixin.TargetCard == null);
+
+            if (requiresTargetMixin != null)
+            {
+                // Enter targeting mode
+                targetingMode = true;
+                selectedCardIndex = index;
+
+                // Determine valid target types (simplified for now)
+                targetType = (requiresTargetMixin.ValidTarget & TargetingFlags.Field) > 0 ? "field" : "hand";
+            }
+            else
+            {
+                // Play the card directly
+                bool success = GameService.PlayCard(GameId, index);
+
+                if (success)
+                {
+                    UpdateGameState();
+                }
+            }
+        }
+    }
+
+    private void HandleFieldCardClick(int index)
+    {
+        if (!isPlayerTurn || isGameEnded) return;
+
+        if (targetingMode && targetType == "field")
+        {
+            // Play the selected card targeting a field card
+            bool success = GameService.PlayCardTargetingFieldCard(GameId, selectedCardIndex, index);
+
+            if (success)
+            {
+                targetingMode = false;
+                selectedCardIndex = -1;
+                UpdateGameState();
+            }
+        }
+    }
+}

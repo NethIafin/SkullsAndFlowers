@@ -8,6 +8,8 @@ public class SpawnTokenWhenPlayedMixin<T> : IPlayCardMixin where T : ICardTempla
     public void OnPlayed(GameContext context, ICard playedCard,  IPlayField field, IPlayer playedPlayer)
     {
         var tokenTemplate = new T();
-        context.SchedulePlayAction(tokenTemplate.GenerateCard(), field, playedPlayer);
+        var token = tokenTemplate.GenerateCard();
+        token.Owner = playedPlayer;
+        context.SchedulePlaceAction(token ,playedPlayer);
     }
 }

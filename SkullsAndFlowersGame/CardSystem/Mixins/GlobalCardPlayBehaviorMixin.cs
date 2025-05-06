@@ -9,7 +9,7 @@ public class GlobalCardPlayBehaviorMixin : IPlayCardMixin
     {
         foreach (var card in context.SharedField.Cards)
         {
-            context.ScheduleDiscardAction(card, context.SharedField, playedPlayer);
+            context.ScheduleDiscardAction(card, playedPlayer);
         }
 
         field.RemoveCard(playedCard);

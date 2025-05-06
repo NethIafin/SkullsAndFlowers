@@ -2,10 +2,10 @@
 
 namespace SkullsAndFlowersGame.CardSystem.Mixins;
 
-public class FieldPowerMixin : IValueMixin<int>, IEndTurnFieldMixin
+public class FieldPowerMixin : IValueMixin<int?>, IEndTurnFieldMixin
 {
     public string MixinId => "Field Power";
-    public int Value { get; set; }
+    public int? Value { get; set; }
     
     public void OnTurnEnd(GameContext context, IPlayField field, IPlayer activePlayer)
     {

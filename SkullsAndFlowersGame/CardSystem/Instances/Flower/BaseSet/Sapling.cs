@@ -7,7 +7,7 @@ public class Sapling: ICardTemplate
     public ICard GenerateCard()
     {
         return MixinContainerBuilder.StartCard("sapling")
-            .SetCardPower(3)
+            .SetCardPower(2)
             .Build();
     }
 }

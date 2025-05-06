@@ -39,9 +39,9 @@ public class GameContext : IMixinContainer
         ScheduledActions.Enqueue(new ScheduledPlayAction { Card = card, Destination = field, Player = player });
     }
     
-    public void ScheduleDiscardAction(ICard card, ICardContainer container, IPlayer player)
+    public void ScheduleDiscardAction(ICard card, IPlayer player)
     {
-        ScheduledActions.Enqueue(new ScheduledDiscardAction { Card = card, Source = container, Player = player });
+        ScheduledActions.Enqueue(new ScheduledDiscardAction { Card = card, Player = player });
     }
     
     public void ScheduleToDiscardPileAction(ICard card)

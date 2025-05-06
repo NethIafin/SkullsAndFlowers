@@ -1,13 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using SkullsAndFlowersGame;
-using SkullsAndFlowersGame.CardSystem;
-using SkullsAndFlowersGame.CardSystem.Instances.Admin;
-using SkullsAndFlowersGame.CardSystem.Instances.Flower.Expansion0;
 using SkullsAndFlowersGame.CardSystem.Instances.Mutators.WorldStart;
 using SkullsAndFlowersGame.CardSystem.Managers;
 using SkullsAndFlowersGame.CardSystem.Mixins;
-using SkullsAndFlowersGame.CardSystem.Mixins.Abstractions;
 
 var game = new DefaultWorld().PrepareWorld();
 var gameHandler = new TurnManager()

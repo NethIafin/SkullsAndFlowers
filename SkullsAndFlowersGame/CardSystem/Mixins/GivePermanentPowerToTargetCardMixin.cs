@@ -46,7 +46,7 @@ public static class GivePermanentPowerToTargetCardMixinExtension
         int buffAmount = 1, int cardCountRequirement = 1)
 
     {
-        return builder.AddMixin(new GivePermanentPowerToTargetCardMixin
+        return builder.AddHandler<RequiresTargetCardInPlayMixin>().AddMixin(new GivePermanentPowerToTargetCardMixin
             { RequiredTargetCount = cardCountRequirement, BuffAmount = buffAmount });
     }
 }

@@ -1,0 +1,209 @@
+﻿@page "/deck-builder"
+@rendermode InteractiveServer
+@using SkullsAndFlowersWeb.Services
+@using SkullsAndFlowersGame.CardSystem
+@using SkullsAndFlowersGame
+@inject DeckService DeckService
+
+<PageTitle>Deck Builder - Skulls And Flowers</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Deck Builder</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="deckName" class="form-label">Deck Name</label>
+                                <input type="text" id="deckName" class="form-control" @bind="deckName" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button class="btn btn-primary me-2" @onclick="SaveDeck">Save Deck</button>
+                            <button class="btn btn-secondary" @onclick="ClearSelections">Clear</button>
+                        </div>
+                    </div>
+
+                    <hr />
+                    
+                    <h3>Available Cards</h3>
+                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                        @foreach (var cardName in availableCards)
+                        {
+                            <div class="col">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <CardComponent Card="@CardFromName(cardName)"/>
+                                        <div class="d-flex align-items-center mt-3">
+                                            <button class="btn btn-sm btn-outline-secondary me-2"
+                                                    @onclick="() => DecrementCard(cardName)"
+                                                    disabled="@(GetCardCount(cardName) <= 0)">-</button>
+                                            <span class="mx-2">@GetCardCount(cardName)</span>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    @onclick="() => IncrementCard(cardName)"
+                                                    disabled="@(GetCardCount(cardName) >= 3)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Saved Decks</h2>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        @foreach (var name in savedDeckNames)
+                        {
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                    @onclick="() => LoadDeck(name)">
+                                @name
+                                <span class="badge bg-primary rounded-pill">
+                                    @(DeckService.TryGetDeck(name, out var deck) ? deck.Count : 0)
+                                </span>
+                            </button>
+                        }
+                    </div>
+                    
+                    @if (!savedDeckNames.Any())
+                    {
+                        <div class="alert alert-info mt-3">
+                            No saved decks yet. Create and save a deck using the form on the left.
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>Current Selection</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        @foreach (var kvp in cardSelections.Where(kvp => kvp.Value > 0).OrderBy(kvp => kvp.Key))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @kvp.Key
+                                <span class="badge bg-primary rounded-pill">@kvp.Value</span>
+                            </li>
+                        }
+                    </ul>
+                    
+                    <div class="alert @(totalCards > 0 ? "alert-info" : "alert-warning") mt-3">
+                        Total Cards: @totalCards
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<string> availableCards = new();
+    private List<string> savedDeckNames = new();
+    private Dictionary<string, int> cardSelections = new();
+    private string deckName = string.Empty;
+    private int totalCards => cardSelections.Values.Sum();
+
+    protected override void OnInitialized()
+    {
+        // Initialize available cards
+        availableCards = DeckService.GetAvailableCardNames().OrderBy(n => n).ToList();
+        
+        // Initialize card selections with 0 count for each card
+        foreach (var cardName in availableCards)
+        {
+            cardSelections[cardName] = 0;
+        }
+        
+        // Load saved deck names
+        savedDeckNames = DeckService.GetSavedDeckNames().ToList();
+    }
+
+    private void IncrementCard(string cardName)
+    {
+        if (cardSelections.ContainsKey(cardName))
+        {
+            cardSelections[cardName]++;
+        }
+        else
+        {
+            cardSelections[cardName] = 1;
+        }
+    }
+
+    private void DecrementCard(string cardName)
+    {
+        if (cardSelections.ContainsKey(cardName) && cardSelections[cardName] > 0)
+        {
+            cardSelections[cardName]--;
+        }
+    }
+
+    private int GetCardCount(string cardName)
+    {
+        return cardSelections.ContainsKey(cardName) ? cardSelections[cardName] : 0;
+    }
+
+    private void SaveDeck()
+    {
+        if (string.IsNullOrWhiteSpace(deckName))
+        {
+            return;
+        }
+        
+        // Save it
+        DeckService.SaveDeck(deckName, cardSelections);
+        
+        // Refresh saved deck names
+        savedDeckNames = DeckService.GetSavedDeckNames().ToList();
+    }
+
+    private void LoadDeck(string name)
+    {
+        if (DeckService.TryGetDeck(name, out var deck))
+        {
+            // Reset current selections
+            foreach (var cardName in availableCards)
+            {
+                cardSelections[cardName] = 0;
+            }
+            
+            // Count cards in the deck
+            foreach (var card in deck.Cards)
+            {
+                if (card.Identifier != null && cardSelections.ContainsKey(card.Identifier))
+                {
+                    cardSelections[card.Identifier]++;
+                }
+            }
+            
+            // Set the deck name
+            deckName = name;
+        }
+    }
+
+    private ICard CardFromName(string name)
+    {
+        return GameStateHelper.GenerateCard(name);
+    }
+
+    private void ClearSelections()
+    {
+        foreach (var cardName in availableCards)
+        {
+            cardSelections[cardName] = 0;
+        }
+        deckName = string.Empty;
+    }
+}

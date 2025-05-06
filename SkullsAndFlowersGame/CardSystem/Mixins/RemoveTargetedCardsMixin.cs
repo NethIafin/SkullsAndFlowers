@@ -31,7 +31,7 @@ public class DiscardTargetedCardsMixin : IPlayCardMixin
         {
             if (validTarget is not { TargetCard: not null, TargetCardContainer: not null }) continue;
             
-            context.ScheduleDiscardAction(validTarget.TargetCard, validTarget.TargetCardContainer, playedPlayer);
+            context.ScheduleDiscardAction(validTarget.TargetCard, playedPlayer);
         }
     }
 }

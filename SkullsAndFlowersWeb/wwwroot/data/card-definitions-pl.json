@@ -1,0 +1,158 @@
+﻿{
+  "tulip": {
+    "description": "",
+    "imageUrl": "images/cards/tulip.png",
+    "power": 3,
+    "customName": "tulipan"
+  },
+  "daisy": {
+    "description": "Zwiększa moc twojego pola o 1.",
+    "imageUrl": "images/cards/daisy.png",
+    "power": 1,
+    "customName": "stokrotka"
+  },
+  "rose": {
+    "description": "⚡ Odrzuć wybraną kartę z twojej ręki. ♻ Dobierasz.",
+    "imageUrl": "images/cards/rose.png",
+    "power": 6,
+    "customName": "róża"
+  },
+  "oak": {
+    "description": "⚡ Stwórz 3 żołędziowe żetony (1)",
+    "imageUrl": "images/cards/oak.png",
+    "power": 0,
+    "customName": "dąb"
+  },
+  "acorn": {
+    "description": "",
+    "imageUrl": "images/cards/acorn.png",
+    "power": 1,
+    "customName": "żołądź"
+  },
+  "clear skies": {
+    "description": "⚡ Dobierasz.",
+    "imageUrl": "images/cards/clear_skies.png",
+    "globalSymbol": "⇆",
+    "customName": "bezchmurne niebo"
+  },
+  "soil fertilizing": {
+    "description": "♻ Dobierz 3 karty",
+    "imageUrl": "images/cards/soil_fertilizing.png",
+    "power": 0,
+    "customName": "nawożenie gleby"
+  },
+  "forget-me-not weed": {
+    "description": "Zagraj, jeśli została odrzucona. Wróć na pole, jeśli zostanie odrzucona lub usunięta.",
+    "imageUrl": "images/cards/forget-me-not_weed.png",
+    "power": 1,
+    "customName": "chwast niezapominajka"
+  },
+  "monsoon": {
+    "description": "🌅 Odrzuć wierzchnią kartę swojej talii",
+    "imageUrl": "images/cards/monsoon.png",
+    "globalSymbol": "⇆",
+    "customName": "monsun"
+  },
+  "royal rose": {
+    "description": "⚡ Odrzuć wybraną kartę o mocy 4 lub większej z twojej ręki.",
+    "imageUrl": "images/cards/royal_rose.png",
+    "power": 8,
+    "customName": "królewska róża"
+  },
+  "royal tulip": {
+    "description": "⚡ Zwróć wybranego tulipana z twojego pola gry.",
+    "imageUrl": "images/cards/royal_tulip.png",
+    "power": 4,
+    "customName": "królewski tulipan"
+  },
+  "sapling": {
+    "description": "",
+    "imageUrl": "images/cards/sapling.png",
+    "power": 2,
+    "customName": "sadzonka"
+  },
+  "buddy bud tree": {
+    "description": "⚡ Stwórz 2 żetony Pąk (1)",
+    "imageUrl": "images/cards/buddy_bud_tree.png",
+    "power": 0,
+    "customName": "drzewo pączkowy kumpel"
+  },
+  "bud": {
+    "description": "",
+    "imageUrl": "images/cards/bud.png",
+    "power": 1,
+    "customName": "pąk"
+  },
+  "dandelion": {
+    "description": "⚡ Wybierz kartę w twojej grze. Trwale zwiększ moc wybranej karty o 1",
+    "imageUrl": "images/cards/dandelion.png",
+    "power": 1,
+    "customName": "mniszek"
+  },
+  "birch": {
+    "description": "⚡ Wybierz dwie karty w twojej grze. Odrzuć je",
+    "imageUrl": "images/cards/birch.png",
+    "power": 4,
+    "customName": "brzoza"
+  },
+  "nutrient": {
+    "description": "🔄 Zniszcz losową kartę na stosie kart odrzuconych, trwale zwiększ moc losowej karty na polu o 1",
+    "imageUrl": "images/cards/nutrient.png",
+    "power": 0,
+    "customName": "składnik odżywczy"
+  },
+  "spruce": {
+    "description": "⚡ Dobierz kartę. ♻ Odrzuć losową kartę z ręki.",
+    "imageUrl": "images/cards/spruce.png",
+    "power": 1,
+    "customName": "świerk"
+  },
+  "soil tilling": {
+    "description": "🌅 Odrzuć losową kartę z ręki, jeśli to zrobisz, dobierz kartę.",
+    "imageUrl": "images/cards/soil_tilling.png",
+    "globalSymbol": "⇆",
+    "customName": "uprawa gleby"
+  },
+  "rainstorm": {
+    "description": "Każda karta w grze ma moc 1",
+    "imageUrl": "images/cards/rainstorm.png",
+    "globalSymbol": "⇆",
+    "customName": "ulewa"
+  },
+  "soulflip weed": {
+    "description": "♻ ↘ Stwórz 1 chwast Odwróconej Duszy (2) dla wszystkich przeciwników",
+    "imageUrl": "images/cards/soulflip_weed.png",
+    "power": 6,
+    "customName": "chwast zamiany dusz"
+  },
+  "flipsoul weed": {
+    "description": "",
+    "imageUrl": "images/cards/flipsoul_weed.png",
+    "power": 2,
+    "customName": "chwast odwróconej duszy"
+  },
+  "scorching sunbeam": {
+    "description": "🔄 Odrzuć wszystkie żetony ze wszystkich pól gry",
+    "imageUrl": "images/cards/scorching_sunbeam.png",
+    "globalSymbol": "⇆",
+    "customName": "palący promień słońca"
+  },
+  "striped birch": {
+    "description": "⚡ Każdy gracz dobiera kartę.",
+    "imageUrl": "images/cards/striped_birch.png",
+    "power": 3,
+    "customName": "brzoza pasiasta"
+  },
+  "choicebloom": {
+    "description": "⚡ Dobierz kartę.",
+    "imageUrl": "images/cards/choicebloom.png",
+    "power": 1,
+    "customName": "kwiat wyboru"
+  },
+  "sorrel": {
+    "description": "Zyskuje 1 punkt mocy na polu za każdym razem, gdy dobierasz.",
+    "imageUrl": "images/cards/sorrel.png",
+    "power": 0,
+    "customName": "szczaw"
+  }
+}

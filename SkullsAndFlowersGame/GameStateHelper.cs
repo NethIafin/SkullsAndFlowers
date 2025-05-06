@@ -11,6 +11,9 @@ public static class GameStateHelper
 
     public static void InitCards()
     {
+        if (_cards.Count > 0)
+            return;
+        
         var templates = FindAndInstantiateImplementations<ICardTemplate>();
 
         foreach (var template in templates)
@@ -142,6 +145,13 @@ public static class GameStateHelper
         deck.Shuffle();
 
         return deck;
+    }
+
+    public static ICard GenerateCard(string cardName)
+    {
+        if(_cards.Count == 0)
+            InitCards();
+        return _cards[cardName].GenerateCard();
     }
 
     public static IPlayer GeneratePlayerForDeck(IDeck deckToOwn)

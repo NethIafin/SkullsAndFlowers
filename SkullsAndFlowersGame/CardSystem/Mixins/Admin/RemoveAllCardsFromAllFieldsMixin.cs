@@ -11,12 +11,12 @@ public class RemoveAllCardsFromAllFieldsMixin : IPlayCardMixin
         {
             foreach (var card in playField.Cards)
             {
-                context.ScheduleDiscardAction(card, playField, playedPlayer);
+                context.ScheduleDiscardAction(card, playedPlayer);
             }
         }
         foreach (var card in context.SharedField.Cards)
         {
-            context.ScheduleDiscardAction(card, context.SharedField, playedPlayer);
+            context.ScheduleDiscardAction(card, playedPlayer);
         }
     }
 }

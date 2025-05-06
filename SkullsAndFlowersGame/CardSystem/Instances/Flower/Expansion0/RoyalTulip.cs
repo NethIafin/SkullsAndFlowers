@@ -8,7 +8,7 @@ public class RoyalTulip : ICardTemplate
     public ICard GenerateCard()
     {
         return MixinContainerBuilder.StartCard("royal tulip")
-            .SetCardPower(5)
+            .SetCardPower(4)
             .RequireReturnToHandOneNamedTargetOnField("tulip")
             .Build();
     }

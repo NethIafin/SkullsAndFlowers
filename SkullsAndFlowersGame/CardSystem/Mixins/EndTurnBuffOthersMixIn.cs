@@ -2,7 +2,7 @@
 
 namespace SkullsAndFlowersGame.CardSystem.Mixins;
 
-public class EndTurnBuffOthersMixIn : IValueMixin<int>, IEndTurnCardMixin
+public class EndTurnBuffOthersMixIn : IValueMixin<int>, IPostEndTurnCardMixin
 {
     public string MixinId => "buff other cards";
     public void OnTurnEnd(GameContext context, ICard card, IPlayer activePlayer)

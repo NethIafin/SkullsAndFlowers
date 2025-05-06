@@ -1,0 +1,152 @@
+﻿@rendermode InteractiveServer
+@using SkullsAndFlowersWeb.Services
+@using SkullsAndFlowersGame.CardSystem
+@using SkullsAndFlowersGame.CardSystem.Mixins
+@using SkullsAndFlowersGame.CardSystem.Mixins.Abstractions
+@inject CardDefinitionService CardDefinitionService
+
+<div class="game-card @AdditionalClasses" 
+     id="@CardId"
+     style="border-color: @GetRarityColor()" 
+     @onclick="OnClick">
+    <div class="card-inner">
+        @if (!string.IsNullOrEmpty(GetImageUrl()))
+        {
+            <div class="card-image" style="background-image: url('@GetImageUrl()')"></div>
+        }
+        
+        <div class="card-name">@GetCustomName()</div>
+        
+        @if (Card.GetOfType<CardCurrentPowerMixin>().FirstOrDefault() is { Value: not null } currentPowerMixin)
+        {
+            <div class="card-power">@currentPowerMixin.Value</div>
+        }
+        else if (Card.GetOfType<CardPowerMixin>().FirstOrDefault() is {} powerMixin)
+        {
+            <div class="card-power">@powerMixin.Value</div>
+        }
+        else if (GetPowerFromDefinition() is { } powerValue)
+        {
+            <div class="card-power">@powerValue</div>
+        }
+        
+        @if (!string.IsNullOrEmpty(GetGlobalSymbolFromDefinition()))
+        {
+            <div class="card-global-symbol">@GetGlobalSymbolFromDefinition()</div>
+        }
+        <div class="card-description">@GetProcessedDescription()</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ICard Card { get; set; }
+    
+    [Parameter]
+    public string CardId { get; set; }
+    
+    [Parameter]
+    public string AdditionalClasses { get; set; } = string.Empty;
+    
+    [Parameter]
+    public EventCallback<ICard> OnCardClick { get; set; }
+    
+    [Parameter]
+    public EventCallback OnClickCallback { get; set; }
+    
+    private async Task OnClick()
+    {
+        if (OnCardClick.HasDelegate)
+        {
+            await OnCardClick.InvokeAsync(Card);
+        }
+        else if (OnClickCallback.HasDelegate)
+        {
+            await OnClickCallback.InvokeAsync();
+        }
+    }
+    
+    private string GetDescription()
+    {
+        if (Card?.Identifier == null) return string.Empty;
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).Description;
+    }
+    
+    private string GetProcessedDescription()
+    {
+        string description = GetDescription();
+        
+        if (string.IsNullOrEmpty(description)) return string.Empty;
+        
+        // Process keywords in square brackets
+        // Replace [keyword] with keyword
+        while (description.Contains('[') && description.Contains(']'))
+        {
+            int startIndex = description.IndexOf('[');
+            int endIndex = description.IndexOf(']', startIndex);
+            
+            if (endIndex > startIndex)
+            {
+                string keyword = description.Substring(startIndex, endIndex - startIndex + 1);
+                string processedKeyword = keyword.Trim('[', ']');
+                
+                // Special handling for [Play:] vs [Play]
+                if (processedKeyword.EndsWith(':'))
+                {
+                    description = description.Replace(keyword, processedKeyword);
+                }
+                else 
+                {
+                    description = description.Replace(keyword, processedKeyword);
+                }
+            }
+            else
+            {
+                break; // Prevent infinite loop if brackets are malformed
+            }
+        }
+        
+        return description;
+    }
+    
+    private IEnumerable<string> GetKeywords()
+    {
+        if (Card?.Identifier == null) return Enumerable.Empty<string>();
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).Keywords;
+    }
+    
+    private string GetCustomName()
+    {
+        if (Card?.Identifier == null) return "ERROR";
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).CustomName ?? Card?.Identifier ?? "ERROR";
+    }
+    
+    private string GetImageUrl()
+    {
+        if (Card?.Identifier == null) return string.Empty;
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).ImageUrl;
+    }
+    
+    private string GetRarityColor()
+    {
+        if (Card?.Identifier == null) return "#6c757d";
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).RarityColor;
+    }
+    
+    private int? GetPowerFromDefinition()
+    {
+        if (Card?.Identifier == null) return null;
+        
+        // Don't return power if card has a global symbol
+        if (!string.IsNullOrEmpty(GetGlobalSymbolFromDefinition()))
+            return null;
+            
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).Power;
+    }
+    
+    private string GetGlobalSymbolFromDefinition()
+    {
+        if (Card?.Identifier == null) return string.Empty;
+        return CardDefinitionService.GetCardDefinition(Card.Identifier).GlobalSymbol;
+    }
+}

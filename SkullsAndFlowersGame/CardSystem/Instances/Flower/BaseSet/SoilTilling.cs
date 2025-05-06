@@ -2,12 +2,12 @@
 
 namespace SkullsAndFlowersGame.CardSystem.Instances.Flower.BaseSet;
 
-public class SoilFertilizing : ICardTemplate
+public class SoilTilling: ICardTemplate
 {
     public ICard GenerateCard()
     {
-        return MixinContainerBuilder.StartGlobal("soil fertilizing")
-            .DrawCardOnRemoval(3)
+        return MixinContainerBuilder.StartGlobal("soil tilling")
+            .AddHandler<DiscardRandomCardFromHandOnStartTurnThenDrawCardMixin>()
             .Build();
     }
 }

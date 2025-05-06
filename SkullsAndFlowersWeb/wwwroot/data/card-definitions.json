@@ -1,0 +1,132 @@
+﻿{
+  "tulip": {
+    "description": "",
+    "imageUrl": "images/cards/tulip.png",
+    "power": 3
+  },
+  "daisy": {
+    "description": "Buffs your field's power by 1.",    
+    "imageUrl": "images/cards/daisy.png",
+    "power": 1
+  },
+  "rose": {
+    "description": "⚡ Discard a Target Card from Your Hand. ♻ You Draw.",
+    "imageUrl": "images/cards/rose.png",
+    "power": 6
+  },
+  "oak": {
+    "description": "⚡ Spawn 3 Acorn (1) Token",
+    "imageUrl": "images/cards/oak.png",
+    "power": 0
+  },
+  "acorn": {
+    "description": "",
+    "imageUrl": "images/cards/acorn.png",
+    "power": 1
+  },
+  "clear skies": {
+    "description": "⚡ You Draw.",
+    "imageUrl": "images/cards/clear_skies.png",
+    "globalSymbol": "⇆"
+  },
+  "soil fertilizing": {
+    "description": "♻ Draw 3 cards",
+    "imageUrl": "images/cards/soil_fertilizing.png",
+    "power": 0
+  },
+  "forget-me-not weed": {
+    "description": "Play if Discarded. Return to field if Discarded or Removed.",
+    "imageUrl": "images/cards/forget-me-not_weed.png",
+    "power": 1
+  },
+  "monsoon": {
+    "description": "\uD83C\uDF05 Discard the top card of your Deck",
+    "imageUrl": "images/cards/monsoon.png",
+    "globalSymbol": "⇆"
+  },
+  "royal rose": {
+    "description": "⚡ Discard a Target Card with power 4 or more from Your Hand.",
+    "imageUrl": "images/cards/royal_rose.png",
+    "power": 8
+  },
+  "royal tulip": {
+    "description": "⚡ Return a Target Tulip from Your Play.",
+    "imageUrl": "images/cards/royal_tulip.png",
+    "power": 4
+  },
+  "sapling": {
+    "description": "",
+    "imageUrl": "images/cards/sapling.png",
+    "power": 2
+  },
+  "buddy bud tree": {
+    "description": "⚡ Spawn 2 Bud (1) Token",
+    "imageUrl": "images/cards/buddy_bud_tree.png",
+    "power": 0
+  },
+  "bud": {
+    "description": "",
+    "imageUrl": "images/cards/bud.png",
+    "power": 1
+  },
+  "dandelion": {
+    "description": "⚡ Target card in your play. Permanently increase target card's power by 1",
+    "imageUrl": "images/cards/dandelion.png",
+    "power": 1
+  },
+  "birch": {
+    "description": "⚡ Target two cards in your play. Discard them",
+    "imageUrl": "images/cards/birch.png",
+    "power": 4
+  },
+  "nutrient": {
+    "description": "\uD83D\uDD04 Destroy random card in discard, Permanently increase random card's on field power by 1",
+    "imageUrl": "images/cards/nutrient.png",
+    "power": 0
+  },
+  "spruce": {
+    "description": "⚡ Draw a card. ♻ Discard random card from hand.",
+    "imageUrl": "images/cards/spruce.png",
+    "power": 1
+  },
+  "soil tilling": {
+    "description": "\uD83C\uDF05 Discard random card from hand, if you do, draw a card.",
+    "imageUrl": "images/cards/soil_tilling.png",
+    "globalSymbol": "⇆"
+  },
+  "rainstorm": {
+    "description": "Each Card in Play has Power 1",
+    "imageUrl": "images/cards/rainstorm.png",
+    "globalSymbol": "⇆"
+  },
+  "soulflip weed": {
+    "description": "♻ ↘ Spawn 1 Flipsoul Weed (2) for all opponents",
+    "imageUrl": "images/cards/soulflip_weed.png",
+    "power": 6
+  },
+  "flipsoul weed": {
+    "description": "",
+    "imageUrl": "images/cards/flipsoul_weed.png",
+    "power": 2
+  },
+  "scorching sunbeam": {
+    "description": "\uD83D\uDD04 Discard all Tokens from Each Play",
+    "imageUrl": "images/cards/scorching_sunbeam.png",
+    "globalSymbol": "⇆"
+  },
+  "striped birch": {
+    "description": "⚡ Each Player Draws a card.",
+    "imageUrl": "images/cards/striped_birch.png",
+    "power": 3
+  },
+  "choicebloom": {
+    "description": "⚡ Draw a card.",
+    "imageUrl": "images/cards/choicebloom.png",
+    "power": 1
+  },
+  "sorrel": {
+    "description": "Gains 1 power on field every time you draw.",
+    "imageUrl": "images/cards/sorrel.png",
+    "power": 0
+  }
+}

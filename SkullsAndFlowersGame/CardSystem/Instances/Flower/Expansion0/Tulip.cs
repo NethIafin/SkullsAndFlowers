@@ -7,7 +7,7 @@ public class Tulip : ICardTemplate
     public ICard GenerateCard()
     {
         return MixinContainerBuilder.StartCard("tulip")
-            .SetCardPower(4)
+            .SetCardPower(3)
             .Build();
     }
 }

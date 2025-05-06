@@ -76,8 +76,6 @@ public static partial class GameHandlers
     {
         var success = card.Container?.RemoveCard(card) ?? false;
         card.Container = null;
-        if (!success)
-            return; // card already removed
         
         foreach (var cardDiscardedEffect in EachCardOnFieldMatching<IOtherCardDiscarded>(context))
         {
@@ -156,6 +154,16 @@ public static partial class GameHandlers
 
         context.PlayerHands[playerId].AddCard(nextCard);
         nextCard.Container = context.PlayerHands[playerId];
+        
+        foreach (var cardDrawnEffect in EachCardOnFieldMatchingWithCard<IDrawCardWhenOnFieldMixin>(context))
+        {
+            cardDrawnEffect.Item2.OnCardDrawn(context, cardDrawnEffect.Item1, player);
+        }
+        
+        foreach (var cardDrawnEffect in EachCardInSharedMatchingWithCard<IDrawCardWhenOnFieldMixin>(context))
+        {
+            cardDrawnEffect.Item2.OnCardDrawn(context, cardDrawnEffect.Item1, player);
+        }
     }
     
     public static void StartGame(GameContext context)
@@ -235,6 +243,16 @@ public static partial class GameHandlers
         }
         
         foreach (var cardPlayedEffect in EachCardInSharedMatchingWithCard<IEndTurnCardMixin>(context))
+        {
+            cardPlayedEffect.Item2.OnTurnEnd(context, cardPlayedEffect.Item1, activePlayer);
+        }
+        
+        foreach (var cardPlayedEffect in EachCardOnFieldMatchingWithCard<IPostEndTurnCardMixin>(context))
+        {
+            cardPlayedEffect.Item2.OnTurnEnd(context, cardPlayedEffect.Item1, activePlayer);
+        }
+        
+        foreach (var cardPlayedEffect in EachCardInSharedMatchingWithCard<IPostEndTurnCardMixin>(context))
         {
             cardPlayedEffect.Item2.OnTurnEnd(context, cardPlayedEffect.Item1, activePlayer);
         }

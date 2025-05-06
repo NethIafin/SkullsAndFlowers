@@ -1,0 +1,65 @@
+﻿@using SkullsAndFlowersWeb.Models
+@inject IJSRuntime JSRuntime
+
+<div class="arrow-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+    @foreach (var arrow in Arrows)
+    {
+        <ArrowComponent Arrow="arrow" OnDelete="@(async (arrow) => await DeleteArrowAsync(arrow))" @key="arrow.Id" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<Arrow> Arrows { get; set; } = new List<Arrow>();
+    
+    [Parameter]
+    public EventCallback<Arrow> OnArrowDeleted { get; set; }
+
+    public void AddArrow(string sourceId, string targetId, string text = "")
+    {
+        var arrow = new Arrow
+        {
+            Id = Guid.NewGuid().ToString(),
+            SourceId = sourceId,
+            TargetId = targetId,
+            Text = text
+        };
+        
+        Arrows.Add(arrow);
+        StateHasChanged();
+        
+        // Give the DOM time to update before positioning the arrow
+        InvokeAsync(async () => {
+            await Task.Delay(50);
+            await JSRuntime.InvokeVoidAsync("updateArrow", arrow.Id, arrow.SourceId, arrow.TargetId);
+        });
+    }
+
+    public async Task DeleteArrowAsync(Arrow arrow)
+    {
+        if (arrow != null && Arrows.Contains(arrow))
+        {
+            Arrows.Remove(arrow);
+            await OnArrowDeleted.InvokeAsync(arrow);
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Set up window resize handler
+            await JSRuntime.InvokeVoidAsync("setupArrowResizeHandler");
+            
+            // Update all arrows
+            await Task.Delay(100); // Wait for DOM to be ready
+            await UpdateAllArrows();
+        }
+    }
+
+    public async Task UpdateAllArrows()
+    {
+        await JSRuntime.InvokeVoidAsync("updateAllArrows");
+    }
+}

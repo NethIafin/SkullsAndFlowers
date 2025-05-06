@@ -2,13 +2,14 @@
 
 namespace SkullsAndFlowersGame.CardSystem.Instances.Flower.BaseSet;
 
-public class Daffodil : ICardTemplate
+public class Spruce: ICardTemplate
 {
     public ICard GenerateCard()
     {
-        return MixinContainerBuilder.StartCard("daffodil")
+        return MixinContainerBuilder.StartCard("spruce")
             .SetCardPower(1)
-            .GivePermanentPowerToTargetCard()
+            .DrawCardOnPlay(1)
+            .AddHandler<RemoveRandomCardFromHandOnRemoveMixin>()
             .Build();
     }
 }

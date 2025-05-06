@@ -10,7 +10,6 @@ public class Rose : ICardTemplate
             .SetCardPower(6)
             .AddHandler<RequiresTargetCardInHandMixin>()
             .DiscardTargetedCards()
-            .AddHandler<DrawCardOnDiscardMixin>()
             .AddHandler<DrawCardOnRemoveMixin>()
             .Build();
     }
